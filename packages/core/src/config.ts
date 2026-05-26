@@ -24,10 +24,17 @@ export interface TarsConfig {
   /** Opaque anonymous contributor UUID from Supabase. Present once signed up. */
   contributorId?: string;
   lastUploadAt?: string;
+  /** Inject orchestration coaching back into the agent on prompt submit. Default on. */
+  coaching?: boolean;
 }
 
 export function defaultConfig(surfaces: Surface[]): TarsConfig {
-  return { version: 1, salt: newSalt(), consent: "local-only", surfaces };
+  return { version: 1, salt: newSalt(), consent: "local-only", surfaces, coaching: true };
+}
+
+/** Coaching is on unless explicitly disabled. */
+export function coachingEnabled(cfg: TarsConfig): boolean {
+  return cfg.coaching !== false;
 }
 
 export function loadConfig(paths: TarsPaths): TarsConfig | undefined {

@@ -56,6 +56,14 @@ that returns an **opaque contributor UUID**. Locally we store only that UUID and
   no `SELECT` policy on the contributions table. Only a service-role training/export job can read
   the corpus, and it sees opaque UUIDs, not identities.
 
+## Coaching is computed locally
+
+The pipe-back loop (`tars coach`, and the nudges injected on prompt submit) is derived
+entirely from your own `.tars/sessions` on this machine. It needs no account, no network, and
+no corpus — it works offline from session ~3. Disable it any time with `tars coach --off`.
+The collective/trained-model tier only ever uses the same anonymized, structure-only records
+described above, and only after you opt in.
+
 ## Your controls
 
 | Action | Command |

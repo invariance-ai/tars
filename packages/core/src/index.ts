@@ -9,3 +9,4 @@ export * from "./capture.js";
 export * from "./positive.js";
 export * from "./record.js";
 export * from "./digest.js";
+export * from "./coach.js";

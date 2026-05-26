@@ -1,3 +1,4 @@
+import { buildProfile, coachingLines, MIN_POSITIVE_FOR_COACHING } from "./coach.js";
 import { saltFingerprint } from "./hashing.js";
 import { summarizeSession, type SessionSummary } from "./positive.js";
 import type { FeatureRecord } from "./session.js";
@@ -101,6 +102,20 @@ export function renderDigest(input: DigestInput): string {
   L.push("## Signals this operator does it well");
   L.push(`- Clean stops: ${count(positives, (s) => s.summary.positive.cleanStop)}/${nPos} · Tests pass: ${count(positives, (s) => s.summary.positive.testsPassed)}/${nPos} · Explicit approval: ${count(positives, (s) => s.summary.positive.userApproved)}/${nPos}`);
   L.push("");
+
+  // ---- your edge (what tars coaches the agent toward) ----
+  const profile = buildProfile(input.sessions);
+  if (profile.positiveCount >= MIN_POSITIVE_FOR_COACHING) {
+    const edge = coachingLines(
+      { promptLen: "tiny", hasGoal: false, hasConstraints: false, acceptanceCriteriaPresent: false, decompositionSteps: 0, clarifyingQuestions: false, examplesGiven: false },
+      profile,
+    );
+    if (edge.length) {
+      L.push("## Your edge (what tars coaches your agent toward)");
+      for (const e of edge) L.push(`- ${e}`);
+      L.push("");
+    }
+  }
 
   // ---- recent table ----
   L.push("## Recent positive sessions (anonymized)");

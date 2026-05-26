@@ -5,6 +5,7 @@ import type { Surface } from "@invariance/tars-core";
 
 import { TARS_VERSION } from "./root.js";
 import { captureCommand } from "./commands/capture.js";
+import { coachCommand } from "./commands/coach.js";
 import { digestCommand } from "./commands/digest.js";
 import { hookCommand } from "./commands/hook.js";
 import { initCommand } from "./commands/init.js";
@@ -41,6 +42,15 @@ program
   .option("--prompt-file <path>", "file to read the prompt from, or '-' for stdin")
   .option("--root <path>", "repo root")
   .action((opts) => captureCommand({ promptFile: opts.promptFile, root: opts.root }));
+
+program
+  .command("coach")
+  .description("Show what tars learned from your clean sessions; --on/--off toggles the agent pipe-back")
+  .option("--on", "enable coaching injection")
+  .option("--off", "disable coaching injection")
+  .option("--json", "emit the operator profile as JSON")
+  .option("--root <path>", "repo root")
+  .action((opts) => coachCommand(opts));
 
 program
   .command("digest")

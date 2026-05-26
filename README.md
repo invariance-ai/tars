@@ -1,35 +1,50 @@
 <h1 align="center">tars</h1>
 
 <p align="center">
-  <b>Learn how great operators orchestrate AI coding agents.</b><br/>
+  <b>Your agent learns to orchestrate like your best engineer.</b><br/>
   Anonymous · opt-in · local-first.
 </p>
 
 <p align="center">
-  <a href="#privacy-first">Privacy</a> ·
+  <a href="#the-loop">The loop</a> ·
   <a href="#quickstart">Quickstart</a> ·
+  <a href="#privacy-first">Privacy</a> ·
   <a href="#what-we-collect">What we collect</a> ·
-  <a href="#cli-reference">CLI</a> ·
-  <a href="./PRIVACY.md">PRIVACY.md</a>
+  <a href="#cli-reference">CLI</a>
 </p>
 
 ---
 
-The best operators have a *way* of working an AI coding agent — how they frame a task, when
-they explore before editing, when they write a test first, how rarely they backtrack. That
-skill is mostly invisible and it disappears when the session ends.
+The best operators have a *way* of working an AI coding agent — they explore before editing,
+write the test first, frame with acceptance criteria, rarely backtrack. **tars learns that way
+from your own cleanest sessions and feeds it back into the agent.**
 
-**tars** makes it legible. It hooks into Claude Code, Codex, and Cursor, watches the
-*structure* of how you drive the agent — never your code or your prompts — and writes a
-repo-level **digest** of how you approach tasks. If you choose to, anonymized, structure-only
-records can be contributed to train an open orchestration model that learns from good humans.
+It hooks into Claude Code, Codex, and Cursor, watches the *structure* of how you drive the agent
+(never your code or prompts), scores which sessions went well, and on your next prompt injects
+≤2 terse, specific nudges drawn from what works for *you* — "you Read ~3 files before the first
+edit; explore first", "you almost always land a passing test before stopping; line one up".
 
-It is built to learn from the **positives**: only sessions that actually went well (clean
-finish, tests passing, little rework) are eligible to leave your machine — and only after you
-explicitly opt in.
+## The loop
 
-> Part of the [Invariance](https://invariance.ai) family. Built by people who think the
-> interesting training signal isn't the code — it's the orchestration.
+```
+your sessions ─▶ tars learns your winning method ─▶ injected back into the agent on the next prompt
+      ▲                                                                    │
+      └──────────────────── you keep shipping; the loop tightens ◀─────────┘
+```
+
+Two tiers:
+
+- **Personal coach (local, private, default-on).** Pays off after ~3 clean sessions — no signup,
+  no network, no team buy-in. This is the reason to install. Toggle with `tars coach --off`.
+- **Borrow-the-best (opt-in).** Contribute anonymized, structure-only records and get back the
+  distilled orchestration method of thousands of good operators (the trained model). This is the
+  reason to opt in — and what builds the shared asset.
+
+**Pairs with [gps](https://github.com/invariance-ai/gps):** gps tells your agent about *your code*;
+tars teaches it *how to work*. Method, never codebase facts — that line is what keeps them distinct.
+
+> Part of the [Invariance](https://invariance.ai) family. The interesting training signal isn't
+> the code — it's the orchestration.
 
 ## Privacy first
 
@@ -54,7 +69,8 @@ npx @invariance/tars init --surface claude,codex,cursor
 
 # 2. Just work. Drive Claude Code / Codex / Cursor like you normally would.
 
-# 3. See how you operate — pure-local, never uploaded
+# 3. See what tars learned and what it coaches your agent toward (pure-local)
+npx @invariance/tars coach
 npx @invariance/tars digest --print
 
 # 4. (Optional) contribute to the open model — anonymous, with a preview first
@@ -161,6 +177,7 @@ The weights live in one auditable block ([`positive.ts`](./packages/core/src/pos
 | Command | What it does |
 |---|---|
 | `tars init [--surface claude,codex,cursor] [--root <path>]` | Set up `.tars/` and install agent hooks. Idempotent. |
+| `tars coach [--on] [--off] [--json]` | Show what tars learned from your clean sessions; toggle the agent pipe-back. |
 | `tars digest [--print] [--out <path>] [--json]` | Recompute the local, exportable digest. No network. |
 | `tars status [--json]` | Consent state, session/positive counts, pending uploads, repo fingerprint. |
 | `tars signup` | Anonymous GitHub sign-in to enable upload. Stores only an opaque id. |

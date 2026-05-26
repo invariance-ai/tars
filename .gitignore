@@ -13,3 +13,7 @@ supabase/.temp/
 *.log
 .env
 .env.*
+
+# never commit npm auth
+.npmrc
+.npmrc.publish

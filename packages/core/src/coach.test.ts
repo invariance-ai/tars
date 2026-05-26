@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildProfile, coachingLines, MIN_POSITIVE_FOR_COACHING, renderCoaching } from "./coach.js";
+import { buildProfile, coachingLines, MIN_POSITIVE_FOR_COACHING, renderCoaching, standingLines } from "./coach.js";
 import type { FeatureRecord } from "./session.js";
 
 const t = (m: number) => new Date(Date.UTC(2026, 0, 1, 0, m)).toISOString();
@@ -69,20 +69,25 @@ describe("coachingLines", () => {
     expect(coachingLines(bareFraming, p)).toEqual([]);
   });
 
-  it("surfaces framing gaps and tool-call habits, capped at 2", () => {
+  it("surfaces self-relative framing gaps, capped at 2", () => {
     const p = buildProfile(new Map([["a", cleanSession()], ["b", cleanSession()], ["c", cleanSession()]]));
     const lines = coachingLines(bareFraming, p);
     expect(lines.length).toBeGreaterThan(0);
     expect(lines.length).toBeLessThanOrEqual(2);
-    // bare prompt lacks acceptance + decomposition → the most actionable gaps lead
+    // self-relative phrasing: references the operator's OWN habit, not generic advice
     expect(lines[0]).toMatch(/acceptance criteria/i);
+    expect(lines[0]).toMatch(/you/i);
   });
 
-  it("primes the explore-first read habit when the prompt is well framed", () => {
+  it("stays silent when the prompt already matches the operator's habits (no nag)", () => {
     const p = buildProfile(new Map([["a", cleanSession()], ["b", cleanSession()], ["c", cleanSession()]]));
     const wellFramed = { ...bareFraming, hasGoal: true, acceptanceCriteriaPresent: true, decompositionSteps: 3 };
-    const lines = coachingLines(wellFramed, p);
-    expect(lines.join(" ")).toMatch(/Read ~2 files before the first edit/i);
+    expect(coachingLines(wellFramed, p)).toEqual([]);
+  });
+
+  it("exposes durable habits via standingLines (not per-prompt)", () => {
+    const p = buildProfile(new Map([["a", cleanSession()], ["b", cleanSession()], ["c", cleanSession()]]));
+    expect(standingLines(p).join(" ")).toMatch(/Read ~2 files before the first edit/i);
   });
 });
 

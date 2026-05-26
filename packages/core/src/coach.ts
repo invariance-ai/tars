@@ -91,33 +91,48 @@ export function buildProfile(sessions: Map<string, FeatureRecord[]>): OperatorPr
  * prompt is missing one. Returns at most two lines, ordered by impact. Empty when there
  * isn't enough history to be credible.
  */
+/**
+ * Situational coaching for the CURRENT prompt. Self-relative by construction: every line
+ * fires only when this prompt DEVIATES from something the operator personally does on their
+ * own clean runs ("you usually X — this prompt doesn't"). It is not generic best-practice
+ * advice (that would be a horoscope every model already knows); if the prompt already matches
+ * the operator's habits, it stays silent. That gating is also what keeps it from nagging.
+ */
 export function coachingLines(current: FramingFeatures, profile: OperatorProfile): string[] {
   if (profile.positiveCount < MIN_POSITIVE_FOR_COACHING) return [];
   const candidates: string[] = [];
 
-  // 1–2: framing gaps specific to THIS prompt (most actionable).
+  // Each line = a gap between THIS prompt and the operator's OWN demonstrated habit.
   if (profile.acceptanceRate >= 0.5 && !current.acceptanceCriteriaPresent) {
-    candidates.push("State acceptance criteria up front — your clean sessions almost always do.");
+    candidates.push(`You state acceptance criteria in ${Math.round(profile.acceptanceRate * 100)}% of your clean sessions — this prompt doesn't yet.`);
   }
   if (profile.decompositionAvg >= 2 && current.decompositionSteps === 0) {
-    candidates.push(`Outline ${Math.round(profile.decompositionAvg)}–${Math.round(profile.decompositionAvg) + 1} sub-steps first — that's your pattern on clean runs.`);
-  }
-
-  // 3–5: tool-call habit priming (history-based; valid before any tool runs).
-  if (profile.dominantStrategy === "test_first" && profile.testRate >= 0.5) {
-    candidates.push("Your cleanest work is test-first — write the failing test before editing.");
-  }
-  if (profile.strategyShare.explore_first >= 0.5 && profile.avgReads >= 2) {
-    candidates.push(`On clean runs you Read ~${Math.round(profile.avgReads)} files before the first edit — explore before diving in.`);
-  }
-  if (profile.testBeforeStopRate >= 0.6 && profile.dominantStrategy !== "test_first") {
-    candidates.push("You almost always land a passing test before stopping — line one up now.");
+    candidates.push(`You usually outline ~${Math.round(profile.decompositionAvg)} sub-steps before starting — this prompt jumps straight in.`);
   }
   if (profile.goalRate >= 0.6 && !current.hasGoal) {
-    candidates.push("Lead with the goal — your strongest sessions open with it.");
+    candidates.push("Your strong sessions open with an explicit goal — this prompt doesn't state one.");
   }
 
   return candidates.slice(0, 2);
+}
+
+/**
+ * Standing method — the operator's durable habits, independent of any single prompt. Used by
+ * the Session Card and (later) a once-per-session injection. Not fired per prompt: standing
+ * text repeated every turn becomes wallpaper the model ignores.
+ */
+export function standingLines(profile: OperatorProfile): string[] {
+  if (profile.positiveCount < MIN_POSITIVE_FOR_COACHING) return [];
+  const lines: string[] = [];
+  if (profile.strategyShare.explore_first >= 0.5 && profile.avgReads >= 2) {
+    lines.push(`You Read ~${Math.round(profile.avgReads)} files before the first edit on clean runs.`);
+  }
+  if (profile.dominantStrategy === "test_first") {
+    lines.push("Your cleanest work is test-first.");
+  } else if (profile.testBeforeStopRate >= 0.6) {
+    lines.push("You land a passing test before stopping on clean runs.");
+  }
+  return lines.slice(0, 2);
 }
 
 /** Render coaching as the block a hook prints to stdout for the agent to read. */

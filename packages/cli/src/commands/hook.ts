@@ -9,6 +9,7 @@ import {
   readAllSessions,
   readSession,
   renderCoaching,
+  renderSessionCard,
   type Surface,
 } from "@invariance/tars-core";
 
@@ -51,8 +52,16 @@ export async function hookCommand(surface: Surface): Promise<void> {
 
     if (event.kind === "session_end") {
       writeDigest(paths, cfg);
-      const contribution = contributionForSession(readSession(paths, key));
+      const current = readSession(paths, key);
+      const contribution = contributionForSession(current);
       if (contribution) stageContribution(paths, key, contribution);
+
+      // The mirror: print an instant Session Card so every session ends with local value,
+      // no corpus or signup required. Injectable surfaces fold it into context; all surfaces
+      // show it in the terminal.
+      const all = readAllSessions(paths);
+      all.delete(key); // compare against OTHER sessions
+      process.stdout.write(renderSessionCard(current, all) + "\n");
     }
   } catch (err) {
     process.stderr.write(`tars hook: ${(err as Error).message}\n`);

@@ -1,4 +1,4 @@
-import { buildProfile, coachingLines, MIN_POSITIVE_FOR_COACHING } from "./coach.js";
+import { buildProfile, standingLines, MIN_POSITIVE_FOR_COACHING } from "./coach.js";
 import { saltFingerprint } from "./hashing.js";
 import { summarizeSession, type SessionSummary } from "./positive.js";
 import type { FeatureRecord } from "./session.js";
@@ -106,12 +106,9 @@ export function renderDigest(input: DigestInput): string {
   // ---- your edge (what tars coaches the agent toward) ----
   const profile = buildProfile(input.sessions);
   if (profile.positiveCount >= MIN_POSITIVE_FOR_COACHING) {
-    const edge = coachingLines(
-      { promptLen: "tiny", hasGoal: false, hasConstraints: false, acceptanceCriteriaPresent: false, decompositionSteps: 0, clarifyingQuestions: false, examplesGiven: false },
-      profile,
-    );
+    const edge = standingLines(profile);
     if (edge.length) {
-      L.push("## Your edge (what tars coaches your agent toward)");
+      L.push("## Your edge (the method tars learned from your clean sessions)");
       for (const e of edge) L.push(`- ${e}`);
       L.push("");
     }

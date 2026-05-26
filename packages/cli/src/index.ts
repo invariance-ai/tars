@@ -4,6 +4,7 @@ import { Command } from "commander";
 import type { Surface } from "@invariance/tars-core";
 
 import { TARS_VERSION } from "./root.js";
+import { cardCommand } from "./commands/card.js";
 import { captureCommand } from "./commands/capture.js";
 import { coachCommand } from "./commands/coach.js";
 import { digestCommand } from "./commands/digest.js";
@@ -42,6 +43,13 @@ program
   .option("--prompt-file <path>", "file to read the prompt from, or '-' for stdin")
   .option("--root <path>", "repo root")
   .action((opts) => captureCommand({ promptFile: opts.promptFile, root: opts.root }));
+
+program
+  .command("card")
+  .description("Mirror: how you tend to drive the agent across your sessions (local, no corpus)")
+  .option("--json", "emit the operator profile as JSON")
+  .option("--root <path>", "repo root")
+  .action((opts) => cardCommand(opts));
 
 program
   .command("coach")

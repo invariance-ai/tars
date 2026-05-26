@@ -1,50 +1,59 @@
 <h1 align="center">tars</h1>
 
 <p align="center">
-  <b>Your agent learns to orchestrate like your best engineer.</b><br/>
-  Anonymous · opt-in · local-first.
+  <b>See how you actually drive your AI coding agent.</b><br/>
+  A local mirror for your orchestration — anonymous · opt-in · local-first.
 </p>
 
 <p align="center">
-  <a href="#the-loop">The loop</a> ·
+  <a href="#the-mirror">The mirror</a> ·
   <a href="#quickstart">Quickstart</a> ·
+  <a href="#coaching-experimental">Coaching</a> ·
   <a href="#privacy-first">Privacy</a> ·
-  <a href="#what-we-collect">What we collect</a> ·
   <a href="#cli-reference">CLI</a>
 </p>
 
 ---
 
-The best operators have a *way* of working an AI coding agent — they explore before editing,
-write the test first, frame with acceptance criteria, rarely backtrack. **tars learns that way
-from your own cleanest sessions and feeds it back into the agent.**
+You drive Claude Code, Codex, and Cursor all day and have **no idea how you actually do it** —
+how often you explore before editing, how much you backtrack, whether you test before you stop.
+tars shows you. It hooks into all three agents, watches the *structure* of how you work (never
+your code or prompts), and ends every session with a **Session Card**: a 4-line mirror of how
+that session went and how it compares to your own past sessions. Local, instant, no account.
 
-It hooks into Claude Code, Codex, and Cursor, watches the *structure* of how you drive the agent
-(never your code or prompts), scores which sessions went well, and on your next prompt injects
-≤2 terse, specific nudges drawn from what works for *you* — "you Read ~3 files before the first
-edit; explore first", "you almost always land a passing test before stopping; line one up".
-
-## The loop
+## The mirror
 
 ```
-your sessions ─▶ tars learns your winning method ─▶ injected back into the agent on the next prompt
-      ▲                                                                    │
-      └──────────────────── you keep shipping; the loop tightens ◀─────────┘
+$ # …after a session, in your terminal:
+[tars] Session card · claude
+  5-30m · 11 tool calls · 6 read / 3 edit · 0 backtracks · explore-first
+  cleaner than 78% of your past 24 sessions (score 0.90)
+  → No passing test ran before you stopped — a quick test would catch regressions.
 ```
 
-Two tiers:
+That's the whole point of installing: reflection in session #1, no corpus, no signup. Run
+`tars card` any time to see how you tend to operate.
 
-- **Personal coach (local, private, default-on).** Pays off after ~3 clean sessions — no signup,
-  no network, no team buy-in. This is the reason to install. Toggle with `tars coach --off`.
-- **Borrow-the-best (opt-in).** Contribute anonymized, structure-only records and get back the
-  distilled orchestration method of thousands of good operators (the trained model). This is the
-  reason to opt in — and what builds the shared asset.
+## Coaching (experimental)
 
-**Pairs with [gps](https://github.com/invariance-ai/gps):** gps tells your agent about *your code*;
-tars teaches it *how to work*. Method, never codebase facts — that line is what keeps them distinct.
+Once tars has seen a few of your clean sessions, it can inject **self-relative** nudges back
+into the agent — only when *this* prompt deviates from what *you* normally do ("you state
+acceptance criteria in 80% of your clean sessions — this prompt doesn't yet"). Never generic
+best-practice; gated so it stays quiet when you're already on-pattern. On by default for
+Claude Code/Codex (Cursor is observe-only); `tars coach --off` to silence.
 
-> Part of the [Invariance](https://invariance.ai) family. The interesting training signal isn't
-> the code — it's the orchestration.
+> **Honesty note:** in a fair, blind A/B (`claude -p`, judge instructed to ignore process
+> buzzwords) the coaching showed **no measurable one-shot quality lift**. A strong model already
+> does the obvious things. We ship coaching as *experimental* and lead with the mirror, which is
+> useful on day one regardless. We're working on capturing real outcome signals (rework, cycle
+> time) to find where — if anywhere — coaching actually moves the needle.
+
+**Pairs with [gps](https://github.com/invariance-ai/gps):** gps gives your agent memory of *your
+code*; tars mirrors *how you work*. Method, never codebase facts.
+
+> Part of the [Invariance](https://invariance.ai) family. **Roadmap:** the individual mirror is
+> the wedge; the direction we're most excited about is a team view — how a whole eng team drives
+> agents, and which patterns track with less rework — for the eng lead who has zero visibility today.
 
 ## Privacy first
 
@@ -67,16 +76,19 @@ This is the whole design, not a footnote. See [PRIVACY.md](./PRIVACY.md) for the
 # 1. Set up tars in a repo and install the agent hooks (all three by default)
 npx @invariance/tars init --surface claude,codex,cursor
 
-# 2. Just work. Drive Claude Code / Codex / Cursor like you normally would.
+# 2. Just work. Each session ends with a Session Card in your terminal.
 
-# 3. See what tars learned and what it coaches your agent toward (pure-local)
-npx @invariance/tars coach
+# 3. See how you tend to operate, any time (pure-local, no corpus)
+npx @invariance/tars card
 npx @invariance/tars digest --print
 
-# 4. (Optional) contribute to the open model — anonymous, with a preview first
+# 4. (Optional, experimental) self-relative coaching back into the agent
+npx @invariance/tars coach            # show what it learned / --off to silence
+
+# 5. (Optional) contribute anonymized, structure-only records — preview first
 npx @invariance/tars signup
-npx @invariance/tars upload --dry-run   # see EXACTLY what would be sent
-npx @invariance/tars upload             # confirm, then send
+npx @invariance/tars upload --dry-run  # see EXACTLY what would be sent
+npx @invariance/tars upload            # confirm, then send
 ```
 
 `init` is idempotent and merges into your existing hook configs without touching anything else.
@@ -177,7 +189,8 @@ The weights live in one auditable block ([`positive.ts`](./packages/core/src/pos
 | Command | What it does |
 |---|---|
 | `tars init [--surface claude,codex,cursor] [--root <path>]` | Set up `.tars/` and install agent hooks. Idempotent. |
-| `tars coach [--on] [--off] [--json]` | Show what tars learned from your clean sessions; toggle the agent pipe-back. |
+| `tars card [--json]` | The mirror: how you tend to drive the agent across sessions. Local, no corpus. |
+| `tars coach [--on] [--off] [--json]` | Experimental self-relative coaching; toggle the agent pipe-back. |
 | `tars digest [--print] [--out <path>] [--json]` | Recompute the local, exportable digest. No network. |
 | `tars status [--json]` | Consent state, session/positive counts, pending uploads, repo fingerprint. |
 | `tars signup` | Anonymous GitHub sign-in to enable upload. Stores only an opaque id. |

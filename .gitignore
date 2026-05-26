@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# tars never commits local capture state by default
+.tars/
+
+# supabase local
+supabase/.branches/
+supabase/.temp/
+
+.DS_Store
+*.log
+.env
+.env.*

@@ -1,0 +1,41 @@
+{
+  "name": "@invariance/tars",
+  "version": "0.1.0",
+  "description": "tars CLI — anonymous, opt-in orchestration telemetry for AI coding agents.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/invariance-ai/tars.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/invariance-ai/tars#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "tars": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsx src/index.ts"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@invariance/tars-adapters": "workspace:*",
+    "@invariance/tars-core": "workspace:*",
+    "@invariance/tars-upload": "workspace:*",
+    "commander": "^12.1.0",
+    "kleur": "^4.1.5",
+    "yaml": "^2.5.0"
+  }
+}

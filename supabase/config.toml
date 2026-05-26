@@ -1,0 +1,40 @@
+project_id = "tars"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# The site URL is where users are redirected after auth; loopback ports are added at runtime.
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["http://127.0.0.1", "http://localhost"]
+jwt_expiry = 3600
+enable_signup = true
+
+# GitHub is the only sign-in method. Anonymous means: GitHub verifies the human once,
+# and only an opaque contributor UUID is ever associated with uploaded data.
+[auth.external.github]
+enabled = true
+client_id = "env(TARS_GITHUB_CLIENT_ID)"
+secret = "env(TARS_GITHUB_SECRET)"
+redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"

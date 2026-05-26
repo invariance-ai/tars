@@ -1,0 +1,34 @@
+{
+  "name": "@invariance/tars-adapters",
+  "version": "0.1.0",
+  "description": "Surface adapters that normalize Claude Code, Codex, and Cursor hook events for tars.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/invariance-ai/tars.git",
+    "directory": "packages/adapters"
+  },
+  "homepage": "https://github.com/invariance-ai/tars#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/**",
+    "src/**",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@invariance/tars-core": "workspace:*"
+  }
+}
